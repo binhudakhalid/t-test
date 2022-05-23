@@ -1,0 +1,401 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Track4j Normalizer
+  description: Das Tracking Backend service, der für die Auslieferung des Trackings und für das Sammeln der Daten verantwortlich ist.
+  contact:
+    name: a
+    email: a
+servers:
+  - url: http://a.jobware.net
+  - url: http://as.jobware.net:8060
+  - url: http://localhost:8080
+paths:
+  /feedMe:
+    put:
+      description: |
+
+      operationId: feedMeToQueue
+      requestBody:
+        description: This is the same stuff which goes into the queue from the webhandler
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackAuth'
+      responses:
+        '204':
+          description: No Content
+  /wannapply:
+    put:
+      description: |
+
+      operationId: lockDownSomeApply
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogApply'
+      responses:
+        '204':
+          description: No Content
+
+  /anonymizeData:
+    put:
+      description: |
+
+      operationId: anonymizeData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnonymizeDataSchema'
+      responses:
+        '204':
+          description: No Content
+  /replayRules:
+    put:
+      description: |
+
+      operationId: replayRules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplayRules'
+      responses:
+        '204':
+          description: No Content
+  /ensureUniqueHourJmsHandler:
+    put:
+      description: |
+
+      operationId: ensureUniqueHourJmsHandler
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDatabase'
+      responses:
+        '204':
+          description: No Content
+
+components:
+  schemas:
+    LogApply:
+      properties:
+        masterBr:
+          type: string
+        mandant:
+          type: string
+        channel:
+          type: string
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+    AnonymizeDataSchema:
+      properties:
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+    ReplayRules:
+      properties:
+        message:
+          type: integer
+          format: int64
+          example: 11
+          description: 'Should be in UTC-Hour format'
+          #timestamp:
+          # $ref: '#/components/schemas/timestamp'
+    UpdateDatabase:
+      properties:
+        message:
+          $ref: '#/components/schemas/date'
+          #timestamp:
+          # $ref: '#/components/schemas/timestamp'
+
+    CallbackAuth:
+      required:
+        - headers
+        - ip
+        - timestampRequest
+        - theRealCookie
+        - apiCall
+      properties:
+        headers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Header'
+        ip:
+          type: string
+        timestampRequest:
+          type: integer
+          format: int64
+        theRealCookie:
+          type: string
+        apiCall:
+          $ref: '#/components/schemas/UserApiCall'
+    Header:
+      additionalProperties: true
+      properties:
+        host:
+          type: array
+          items:
+            type: string
+        user-agent:
+          type: array
+          items:
+            type: string
+        accept:
+          type: array
+          items:
+            type: string
+        accept-language:
+          type: array
+          items:
+            type: string
+        accept-encoding:
+          type: array
+          items:
+            type: string
+        cookie:
+          type: array
+          items:
+            type: string
+        connection:
+          type: array
+          items:
+            type: string
+        upgrade-insecure-requests:
+          type: array
+          items:
+            type: string
+        cache-control:
+          type: array
+          items:
+            type: string
+    UserApiCall:
+      properties:
+        advClose:
+          $ref: '#/components/schemas/AdvClose'
+        advInit:
+          $ref: '#/components/schemas/AdvInit'
+        advNotify:
+          $ref: '#/components/schemas/AdvNotify'
+        contextClose:
+          $ref: '#/components/schemas/ContextClose'
+        contextInit:
+          $ref: '#/components/schemas/ContextInit'
+        contextNotify:
+          $ref: '#/components/schemas/ContextNotify'
+        contextPageview:
+          $ref: '#/components/schemas/ContextPageview'
+    AdvInit:
+      required:
+        - unique
+        - timestamp
+        - key
+        - ctoken
+        - gtoken
+        - borderKey
+        - localToken
+        - referrer
+        - href
+      properties:
+        unique:
+          $ref: '#/components/schemas/unique'
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+        key:
+          $ref: '#/components/schemas/key_adv'
+        ctoken:
+          $ref: '#/components/schemas/ctoken'
+        gtoken:
+          $ref: '#/components/schemas/gtoken'
+        borderKey:
+          $ref: '#/components/schemas/borderKey'
+        localToken:
+          $ref: '#/components/schemas/localToken'
+        referrer:
+          $ref: '#/components/schemas/referrer'
+        href:
+          $ref: '#/components/schemas/href'
+        resolution:
+          $ref: '#/components/schemas/resolution'
+    AdvNotify:
+      required:
+        - unique
+        - timestamp
+        - category
+        - action
+        - label
+      properties:
+        unique:
+          $ref: '#/components/schemas/unique'
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+        category:
+          type: string
+          example: event
+        action:
+          type: string
+          example: click
+        label:
+          type: string
+          example: http://xy.al.sites.jobware.net
+    AdvClose:
+      required:
+        - unique
+        - timestamp
+      properties:
+        unique:
+          $ref: '#/components/schemas/unique'
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+    ContextInit:
+      required:
+        - borderKey
+        - timestamp
+        - key
+        - ctoken
+        - gtoken
+        - referrer
+        - href
+      properties:
+        borderKey:
+          $ref: '#/components/schemas/borderKey'
+        localToken:
+          $ref: '#/components/schemas/localToken'
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+        key:
+          $ref: '#/components/schemas/key_context'
+        ctoken:
+          $ref: '#/components/schemas/ctoken'
+        gtoken:
+          $ref: '#/components/schemas/gtoken'
+        referrer:
+          $ref: '#/components/schemas/referrer'
+        href:
+          $ref: '#/components/schemas/href'
+    ContextNotify:
+      required:
+        - borderKey
+        - timestamp
+        - category
+        - action
+        - label
+      properties:
+        borderKey:
+          $ref: '#/components/schemas/borderKey'
+        unique:
+          $ref: '#/components/schemas/unique'
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+        category:
+          type: string
+          example: event
+        action:
+          type: string
+          example: click
+        label:
+          type: string
+          example: viewer-companyprofile-homepage
+    ContextClose:
+      required:
+        - borderKey
+        - timestamp
+      properties:
+        borderKey:
+          $ref: '#/components/schemas/borderKey'
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+    ContextPageview:
+      required:
+        - borderKey
+        - timestamp
+        - href
+      properties:
+        borderKey:
+          $ref: '#/components/schemas/borderKey'
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+        href:
+          $ref: '#/components/schemas/href'
+
+    unique:
+      type: string
+      minLength: 19
+      maxLength: 19
+      pattern: '^[a-z0-9]{9}\.[a-z0-9]{9}#'
+      example: jqxrutw8.zx27bhalna
+      description: |
+        Die Unique-ID wird bei jeder neuen Anzeige neu generiert.
+        Der Schlüssel besteht aus zwei Komponenten, einmal dem UTC-Timestamp in Millisekunden in Base36 (9 Zeichen lang. Zahlen 0-9 und Buchstaben a-z), einem Punkt und einem zufälligen 9-stelligen Wert um mögliche Kollisionen zu minimieren.
+    borderKey:
+      type: string
+      minLength: 19
+      maxLength: 19
+      pattern: '^[a-z0-9]{9}\.[a-z0-9]{9}#'
+      example: jqxruh02.f4q1kjqjsm
+      description: |
+        Der Borderkey wird jeweils einmal pro Tab im Browser generiert, bleibt also zwischen mehreren Anzeigen im gleichen Kontext identisch.
+        Der Schlüssel besteht aus zwei Komponenten, einmal dem UTC-Timestamp in Millisekunden in Base36 (9 Zeichen lang. Zahlen 0-9 und Buchstaben a-z), einem Punkt und einem zufälligen 9-stelligen Wert um mögliche Kollisionen zu minimieren.
+    ctoken:
+      type: string
+      minLength: 32
+      maxLength: 32
+      pattern: '^[a-z0-9]{32}#'
+      example: 0bb4bf08034059a0f4b20b54f26143c9
+      description: |
+        HTML5 Canvas Fingerprint zur Identifizierung von Hardware- und Treiberunterschieden um zu versuchen einem Gerät möglichst einen eindeutigen Wiedererkennungswert zu geben.
+    gtoken:
+      type: string
+      minLength: 32
+      maxLength: 32
+      pattern: '^[a-z0-9]{32}#'
+      example: 783b6771bc2abdb511a7f11122cdbc28
+      description: |
+        WebGL Fingerprint zur Identifizierung von Hardware- und Treiberunterschieden um zu versuchen einem Gerät möglichst einen eindeutigen Wiedererkennungswert zu geben.
+    resolution:
+      type: string
+      minLength: 20
+      maxLength: 20
+      pattern: '^[1-9][0-9]+x[1-9][0-9]+(,[0-9]+°)?$'
+      example: j2560x1440,0°
+      description: |
+        Die Unique-ID wird bei jeder neuen Anzeige neu generiert.
+        Der Schlüssel besteht aus zwei Komponenten, einmal dem UTC-Timestamp in Millisekunden in Base36 (9 Zeichen lang. Zahlen 0-9 und Buchstaben a-z), einem Punkt und einem zufälligen 9-stelligen Wert um mögliche Kollisionen zu minimieren.
+
+    localToken:
+      type: string
+      minLength: 19
+      maxLength: 19
+      pattern: '^[a-z0-9]+\.[a-z0-9]+$'
+      # example: j2560x1440,0°
+      description: ""
+    referrer:
+      type: string
+      example: https://www.jobware.de/Jobs/IT
+    href:
+      type: string
+      example: https://www.jobware.de/a.html?jw_chl_seg=auto
+    key_adv:
+      type: string
+      example: eysY2giOiJDSC0wMDAwMDMyIiwiaWQiOiIwMDk0NDU5MTEiLCJzZWciOiJhdXRvIiwidCI6IjE1NDc1NTc2MzAxMTUiLCJ0YiI6MTU0NzU0Nzk3OTAwMCwidGUiOjE1NjMyMjc5OTkwMDAsInB0IjoiUFRfMDAxIn0=
+    key_context:
+      type: string
+      example: 4ztcj9
+    timestamp:
+      type: integer
+      format: int64
+      example: 1547557628364
+      description: |
+        Zeit in UTC+00:00 in Millisekunden
+    date:
+      type: string
+      format: date-time
+      description: Date and time
+      example: "2021-01-30T08:30:00Z"
